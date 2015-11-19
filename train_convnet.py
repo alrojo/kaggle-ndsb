@@ -64,13 +64,15 @@ for layer in all_layers:
 
 target_var = T.matrix("target")
 
-output = l_out.get_output(deterministic=True)
+train_output = nn.layers.get_output(l_out, deterministic=False)
 if hasattr(config, 'build_objective'):
-    loss = config.build_objective(output, target_var)
+    loss = config.build_objective(train_output, target_var)
 else:
-    loss = nn_plankton.log_loss(output, target_var)
+    loss = nn_plankton.log_loss(train_output, target_var)
 
 train_loss = loss.mean()
+
+eval_output = l_out.get_output(deterministic=True)
 
 all_params = nn.layers.get_all_params(l_out)
 all_excluded_params = nn.layers.get_all_params(l_exclude)
@@ -105,7 +107,7 @@ if hasattr(config, 'censor_updates'):
 
 
 iter_train = theano.function([idx], train_loss, givens=givens, updates=updates)
-compute_output = theano.function([idx], output, givens=givens, on_unused_input="ignore")
+compute_output = theano.function([idx], eval_output, givens=givens, on_unused_input="ignore")
 
 
 if hasattr(config, 'resume_path'):
