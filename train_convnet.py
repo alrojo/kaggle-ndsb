@@ -59,7 +59,7 @@ print "  number of parameters: %d" % num_params
 print "  layer output shapes:"
 for layer in all_layers:
     name = string.ljust(layer.__class__.__name__, 32)
-    print "    %s %s" % (name, layer.get_output_shape(),)
+    print "    %s %s" % (name, nn.layers.get_output_shape(layer))
 
 if hasattr(config, 'build_objective'):
     obj = config.build_objective(l_ins, l_out)
