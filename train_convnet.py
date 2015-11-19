@@ -72,7 +72,7 @@ else:
 
 train_loss = loss.mean()
 
-eval_output = l_out.get_output(deterministic=True)
+eval_output = nn.layers.get_output(l_out, deterministic=True)
 
 all_params = nn.layers.get_all_params(l_out)
 all_excluded_params = nn.layers.get_all_params(l_exclude)
