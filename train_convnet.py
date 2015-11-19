@@ -78,7 +78,7 @@ all_params = nn.layers.get_all_params(l_out)
 all_excluded_params = nn.layers.get_all_params(l_exclude)
 all_params = list(set(all_params) - set(all_excluded_params))
 
-input_ndims = [len(l_in.get_output_shape()) for l_in in l_ins]
+input_ndims = [len(nn.layers.get_output_shape(l_in)) for l_in in l_ins]
 xs_shared = [nn.utils.shared_empty(dim=ndim) for ndim in input_ndims]
 y_shared = nn.utils.shared_empty(dim=2)
 
