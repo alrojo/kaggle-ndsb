@@ -104,7 +104,7 @@ class CyclicSliceLayer(nn.layers.Layer):
         return (4 * input_shape[0],) + input_shape[1:]
 
     def get_output_for(self, input, *args, **kwargs):
-        return nn.utils.concatenate([
+        return T.concatenate([
                 array_tf_0(input),
                 array_tf_90(input),
                 array_tf_180(input),
@@ -130,7 +130,7 @@ class DihedralSliceLayer(nn.layers.Layer):
         return (8 * input_shape[0],) + input_shape[1:]
 
     def get_output_for(self, input, *args, **kwargs):
-        return nn.utils.concatenate([
+        return T.concatenate([
                 array_tf_0(input),
                 array_tf_90(input),
                 array_tf_180(input),
@@ -176,7 +176,7 @@ class CyclicRollLayer(nn.layers.Layer):
             input_permuted = input_unfolded[p].reshape(s)
             permuted_inputs.append(input_permuted)
 
-        return nn.utils.concatenate(permuted_inputs, axis=1) # concatenate long the channel axis
+        return T.concatenate(permuted_inputs, axis=1) # concatenate long the channel axis
 
 
 class DihedralRollLayer(nn.layers.Layer):
@@ -218,7 +218,7 @@ class DihedralRollLayer(nn.layers.Layer):
             input_permuted = input_unfolded[p].reshape(s)
             permuted_inputs.append(input_permuted)
 
-        return nn.utils.concatenate(permuted_inputs, axis=1) # concatenate long the channel axis
+        return T.concatenate(permuted_inputs, axis=1) # concatenate long the channel axis
 
 
 class CyclicConvRollLayer(CyclicRollLayer):
@@ -246,7 +246,7 @@ class CyclicConvRollLayer(CyclicRollLayer):
             input_permuted = inv_tf(input_unfolded[p].reshape(s))
             permuted_inputs.append(input_permuted)
 
-        return nn.utils.concatenate(permuted_inputs, axis=1) # concatenate long the channel axis
+        return T.concatenate(permuted_inputs, axis=1) # concatenate long the channel axis
 
 
 class DihedralConvRollLayer(DihedralRollLayer):
@@ -277,7 +277,7 @@ class DihedralConvRollLayer(DihedralRollLayer):
             input_permuted = inv_tf(input_unfolded[p].reshape(s))
             permuted_inputs.append(input_permuted)
 
-        return nn.utils.concatenate(permuted_inputs, axis=1) # concatenate along the channel axis
+        return T.concatenate(permuted_inputs, axis=1) # concatenate along the channel axis
 
 
 
@@ -306,7 +306,7 @@ class CyclicConvRollLayer_c01b(CyclicConvRollLayer):
             input_permuted = inv_tf(input_unfolded[:, :, :, p, :].reshape(s))
             permuted_inputs.append(input_permuted)
 
-        return nn.utils.concatenate(permuted_inputs, axis=0) # concatenate long the channel axis
+        return T.concatenate(permuted_inputs, axis=0) # concatenate long the channel axis
 
 
 class CyclicPoolLayer(nn.layers.Layer):
@@ -381,7 +381,7 @@ class FlipSliceLayer(nn.layers.Layer):
         return (2 * input_shape[0],) + input_shape[1:]
 
     def get_output_for(self, input, *args, **kwargs):
-        return nn.utils.concatenate([
+        return T.concatenate([
                 array_tf_0(input),
                 array_tf_0f(input),
             ], axis=0)
