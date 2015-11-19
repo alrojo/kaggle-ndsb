@@ -61,14 +61,16 @@ for layer in all_layers:
     name = string.ljust(layer.__class__.__name__, 32)
     print "    %s %s" % (name, nn.layers.get_output_shape(layer))
 
-if hasattr(config, 'build_objective'):
-    obj = config.build_objective(l_ins, l_out)
-else:
-    obj = nn.objectives.Objective(l_out, loss_function=nn_plankton.log_loss)
 
+target_var = T.matrix("target")
 
-train_loss = obj.get_loss()
 output = l_out.get_output(deterministic=True)
+if hasattr(config, 'build_objective'):
+    loss = config.build_objective(output, target_var)
+else:
+    loss = nn_plankton.log_loss(output, target_var)
+
+train_loss = loss.mean()
 
 all_params = nn.layers.get_all_params(l_out)
 all_excluded_params = nn.layers.get_all_params(l_exclude)
@@ -87,7 +89,7 @@ learning_rate = theano.shared(np.float32(learning_rate_schedule[0]))
 idx = T.lscalar('idx')
 
 givens = {
-    obj.target_var: y_shared[idx*config.batch_size:(idx+1)*config.batch_size],
+    target_var: y_shared[idx*config.batch_size:(idx+1)*config.batch_size],
 }
 for l_in, x_shared in zip(l_ins, xs_shared):
      givens[l_in.input_var] = x_shared[idx*config.batch_size:(idx+1)*config.batch_size]
