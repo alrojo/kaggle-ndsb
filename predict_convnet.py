@@ -49,7 +49,7 @@ config = importlib.import_module("configurations.%s" % config_name)
 filename = os.path.splitext(os.path.basename(metadata_path))[0]
 target_path = "predictions/%s--%s--%s--%s.npy" % (subset, config_name, filename, avg_method)
 
-assert metadata['chunks_since_start'] == config.num_chunks_train - 1 # assert that the metadata file contains final parameters.
+#assert metadata['chunks_since_start'] == config.num_chunks_train - 1 # assert that the metadata file contains final parameters.
 
 print "Build model"
 l_ins, l_out = config.build_model()[:2]
@@ -65,14 +65,14 @@ print "  number of parameters: %d" % num_params
 print "  layer output shapes:"
 for layer in all_layers:
     name = string.ljust(layer.__class__.__name__, 32)
-    print "    %s %s" % (name, layer.get_output_shape(),)
+    print "    %s %s" % (name, nn.layers.get_output_shape(layer))
 
-output = l_out.get_output(deterministic=True)
+output = nn.layers.get_output(l_out, deterministic=True)
 
 if avg_method == "avg-probs-geom":
     output = T.log(output)
 
-input_ndims = [len(l_in.get_output_shape()) for l_in in l_ins]
+input_ndims = [len(nn.layers.get_output_shape(l_in)) for l_in in l_ins]
 xs_shared = [nn.utils.shared_empty(dim=ndim) for ndim in input_ndims]
 
 idx = T.lscalar('idx')

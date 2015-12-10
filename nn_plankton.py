@@ -158,7 +158,7 @@ tied_dropout_c01b = TiedDropoutLayer_c01b
 
 
 
-class BatchInterleaveLayer(nn.layers.MultipleInputsLayer):
+class BatchInterleaveLayer(nn.layers.MergeLayer):
     """
     Interleave multiple input batches.
     """

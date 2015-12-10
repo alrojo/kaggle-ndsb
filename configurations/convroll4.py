@@ -64,38 +64,40 @@ data_loader = load.ZmuvRescaledDataLoader(estimate_scale=estimate_scale, num_chu
     patch_size=patch_size, chunk_size=chunk_size, augmentation_params=augmentation_params,
     augmentation_transforms_test=augmentation_transforms_test)
 
+Conv2DLayer = nn.layers.Conv2DLayer
+MaxPool2DLayer = nn.layers.MaxPool2DLayer
 
-# Conv2DLayer = nn.layers.cuda_convnet.Conv2DCCLayer
-# MaxPool2DLayer = nn.layers.cuda_convnet.MaxPool2DCCLayer
+#Conv2DLayer = nn.layers.dnn.Conv2DNNLayer
+#MaxPool2DLayer = nn.layers.dnn.MaxPool2DNNLayer
 
-Conv2DLayer = tmp_dnn.Conv2DDNNLayer
-MaxPool2DLayer = tmp_dnn.MaxPool2DDNNLayer
+#Conv2DLayer = tmp_dnn.Conv2DDNNLayer
+#MaxPool2DLayer = tmp_dnn.MaxPool2DDNNLayer
 
 
 def build_model():
     l0 = nn.layers.InputLayer((batch_size, 1, patch_size[0], patch_size[1]))
     l0c = dihedral.CyclicSliceLayer(l0)
 
-    l1a = Conv2DLayer(l0c, num_filters=32, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l1b = Conv2DLayer(l1a, num_filters=16, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l1 = MaxPool2DLayer(l1b, ds=(3, 3), strides=(2, 2))
+    l1a = Conv2DLayer(l0c, num_filters=32, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l1b = Conv2DLayer(l1a, num_filters=16, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l1 = MaxPool2DLayer(l1b, pool_size=(3, 3), stride=(2, 2))
     l1r = dihedral.CyclicConvRollLayer(l1)
 
-    l2a = Conv2DLayer(l1r, num_filters=64, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l2b = Conv2DLayer(l2a, num_filters=32, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l2 = MaxPool2DLayer(l2b, ds=(3, 3), strides=(2, 2))
+    l2a = Conv2DLayer(l1r, num_filters=64, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l2b = Conv2DLayer(l2a, num_filters=32, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l2 = MaxPool2DLayer(l2b, pool_size=(3, 3), stride=(2, 2))
     l2r = dihedral.CyclicConvRollLayer(l2)
 
-    l3a = Conv2DLayer(l2r, num_filters=128, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l3b = Conv2DLayer(l3a, num_filters=128, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l3c = Conv2DLayer(l3b, num_filters=64, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l3 = MaxPool2DLayer(l3c, ds=(3, 3), strides=(2, 2))
+    l3a = Conv2DLayer(l2r, num_filters=128, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l3b = Conv2DLayer(l3a, num_filters=128, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l3c = Conv2DLayer(l3b, num_filters=64, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l3 = MaxPool2DLayer(l3c, pool_size=(3, 3), stride=(2, 2))
     l3r = dihedral.CyclicConvRollLayer(l3)
 
-    l4a = Conv2DLayer(l3r, num_filters=256, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l4b = Conv2DLayer(l4a, num_filters=256, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
-    l4c = Conv2DLayer(l4b, num_filters=128, filter_size=(3, 3), border_mode="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)    
-    l4 = MaxPool2DLayer(l4c, ds=(3, 3), strides=(2, 2))
+    l4a = Conv2DLayer(l3r, num_filters=256, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l4b = Conv2DLayer(l4a, num_filters=256, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)
+    l4c = Conv2DLayer(l4b, num_filters=128, filter_size=(3, 3), pad="same", W=nn_plankton.Conv2DOrthogonal(1.0), b=nn.init.Constant(0.1), nonlinearity=nn_plankton.leaky_relu)    
+    l4 = MaxPool2DLayer(l4c, pool_size=(3, 3), stride=(2, 2))
     l4r = dihedral.CyclicConvRollLayer(l4)
     l4f = nn.layers.flatten(l4r)
 

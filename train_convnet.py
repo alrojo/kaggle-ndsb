@@ -66,7 +66,7 @@ target_var = T.matrix("target")
 
 train_output = nn.layers.get_output(l_out, deterministic=False)
 if hasattr(config, 'build_objective'):
-    loss = config.build_objective(train_output, target_var)
+    loss = config.build_objective(l_ins, l_out, train_output, target_var)
 else:
     loss = nn_plankton.log_loss(train_output, target_var)
 
@@ -131,7 +131,9 @@ if hasattr(config, 'resume_path'):
 elif hasattr(config, 'pre_init_path'):
     print "Load model parameters for initializing first x layers"
     resume_metadata = np.load(config.pre_init_path)
-    nn.layers.set_all_param_values(l_resume, resume_metadata['param_values'][-len(all_excluded_params):])
+    print "shape of first layer"
+    print resume_metadata['param_values'][1].shape
+    nn.layers.set_all_param_values(l_resume, resume_metadata['param_values'][:len(all_excluded_params)])
 
     chunks_train_idcs = range(config.num_chunks_train)
     losses_train = []
