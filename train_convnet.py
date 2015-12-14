@@ -220,7 +220,7 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
         print "Validating"
         subsets = ["train"]#, "valid"]
         gens = [create_eval_train_gen]#, create_eval_valid_gen]
-        label_sets = [config.data_loader.labels_train]#, config.data_loader.labels_valid]
+        label_sets = [data.labels_train]#, config.data_loader.labels_valid]
         losses_eval = [losses_eval_train]#, losses_eval_valid]
 
         for subset, create_gen, labels, losses in zip(subsets, gens, label_sets, losses_eval):
