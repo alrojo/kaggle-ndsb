@@ -147,7 +147,7 @@ else:
 
 
 print "Load data"
-config.data_loader.load_train()
+#config.data_loader.load_train()
 
 if hasattr(config, 'resume_path'):
     config.data_loader.set_params(resume_metadata['data_loader_params'])
@@ -185,7 +185,11 @@ num_batches_chunk = config.chunk_size // config.batch_size
 
 for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
     print "Chunk %d/%d" % (e + 1, config.num_chunks_train)
-    if e > config.num_chunks:
+    print "chunk_x mean: %.5f" % np.asarray(xs_chunk).mean()
+    print np.asarray(xs_chunk).shape
+    print "chunk_y mean: %.5f" % y_chunk.mean()
+    print y_chunk.shape
+    if e > config.num_chunks_train:
         break;
 
     if e in learning_rate_schedule:

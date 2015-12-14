@@ -24,8 +24,8 @@ augmentation_params = {
     'allow_stretch': 1.3,
 }
 
-batch_size = 128 // 4
-chunk_size = 32768 // 4
+batch_size = 4#128 // 4
+chunk_size = 16#32768 // 4
 num_chunks_train = 840
 
 momentum = 0.9
@@ -60,7 +60,7 @@ augmentation_transforms_test = tta.build_quasirandom_transforms(70, **{
 
 
 
-data_loader = load.ZmuvRescaledDataLoader(estimate_scale=estimate_scale, num_chunks_train=num_chunks_train,
+data_loader = load.RescaledDataLoader(estimate_scale=estimate_scale, num_chunks_train=num_chunks_train,
     patch_size=patch_size, chunk_size=chunk_size, augmentation_params=augmentation_params,
     augmentation_transforms_test=augmentation_transforms_test)
 

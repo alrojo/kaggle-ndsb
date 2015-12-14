@@ -331,8 +331,8 @@ class DataLoader(object):
 
 
 class RescaledDataLoader(DataLoader):
-    def create_random_gen(self, image_gen):
-        gen = data.rescaled_patches_gen_augmented(image_gen, labels=True, self.estimate_scale, patch_size=self.patch_size,
+    def create_random_gen(self, image_gen, labels):
+        gen = data.rescaled_patches_gen_augmented(image_gen, self.estimate_scale, labels=True, patch_size=self.patch_size,
             chunk_size=self.chunk_size, augmentation_params=self.augmentation_params)
 
         def random_gen():

@@ -326,7 +326,7 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1):
     paths_shuffled = np.array(paths)
     
     if labels is not None:
-        labels_shuffled = np.arrays(labels)
+        labels_shuffled = np.array(labels)
     
     while True:
         if shuffle:
@@ -379,8 +379,10 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
                 yield chunk_x, chunk_shape
             
             chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
-            chunk_shape = np.zeros((chunk_size, num_classes), dtype='float32')
-            offset = 0
+            chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
+            if labels:
+		chunk_y = np.zeros((chunk_size, num_classes), dtype='float32')
+	    offset = 0
     if offset > 0:
         if labels:
             yield chunk_x, chunk_y, chunk_shape, offset
