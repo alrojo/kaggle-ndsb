@@ -5,6 +5,8 @@ import shutil
 import numpy as np
 import pandas as pd
 import skimage.io as sk
+from scipy import ndimage
+from scipy import misc
 
 csv = pd.read_csv('./data/train.csv')
 whaleIDs = list(set(csv['whaleID']))
@@ -31,9 +33,14 @@ print "Filling directories ..."
 for i in range(len(train_paths)):
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", (train_paths[i]))
     path_to = "%s%s%s%s%s" % (os.getcwd(), "/data/train/", (csv['whaleID'][i]), "/", (train_paths[i]))
-    shutil.move(path_from, path_to)
+    img = ndimage.imread(path_from)
+    rescaled = ndimage.zoom(img, 0.25)
+#    shutil.move(path_from, path_to)
 
 for path in test_paths:
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", path)
     path_to = "%s%s%s" % (os.getcwd(), "/data/test/", path)
-    shutil.move(path_from, path_to)
+    img = ndimage.imread(path_from)
+    rescaled = ndimage.zoom(img, 0.25)
+    misc.imsave(path_to, rescaled)
+#    shutil.move(path_from, path_to)
