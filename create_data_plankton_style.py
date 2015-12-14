@@ -23,24 +23,28 @@ print "size haleIDs %d" % len(whaleIDs)
 assert len(paths) == (len(train_paths) + len(test_paths))
 assert len(whaleIDs) == 447
 
-#print "Making directories ..."
-#for i in range(len(whaleIDs)):
-#    path = "%s%s%s" % (os.getcwd(), "/data/train/", whaleIDs[i])
-#    print path
-#    os.mkdir(path, 0777)
+print "Making directories ..."
+for i in range(len(whaleIDs)):
+    path = "%s%s%s" % (os.getcwd(), "/data/train/", whaleIDs[i])
+    print path
+    os.mkdir(path, 0777)
 
 print "Filling directories ..."
+print "Train"
 for i in range(len(train_paths)):
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", (train_paths[i]))
     path_to = "%s%s%s%s%s" % (os.getcwd(), "/data/train/", (csv['whaleID'][i]), "/", (train_paths[i]))
     img = ndimage.imread(path_from)
-    rescaled = ndimage.zoom(img, 0.25)
+    rescaled = ndimage.zoom(img, 0.125)
+    print "%d: with shape: %s to shape: %s" %(i, img.shape, rescaled.shape)
+    misc.imsave(path_to, rescaled)
 #    shutil.move(path_from, path_to)
 
+print "Test"
 for path in test_paths:
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", path)
     path_to = "%s%s%s" % (os.getcwd(), "/data/test/", path)
     img = ndimage.imread(path_from)
-    rescaled = ndimage.zoom(img, 0.25)
+    rescaled = ndimage.zoom(img, 0.125)
     misc.imsave(path_to, rescaled)
 #    shutil.move(path_from, path_to)
