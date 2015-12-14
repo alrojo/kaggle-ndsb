@@ -322,7 +322,7 @@ def perturb_rescaled(img, scale, augmentation_params, target_shape=(50, 50), rng
     tform_augment = tform_uncenter + tform_augment + tform_center # shift to center, augment, shift back (for the rotation/shearing)
     return fast_warp(img, tform_rescale + tform_augment, output_shape=target_shape, mode='constant').astype('float32')
 
-def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1):
+def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="john!"):
     paths_shuffled = np.array(paths)
     print "@@GEN_IMAGES@@"    
     print "labels"
@@ -335,6 +335,8 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1):
     print rep
     print "paths"
     print len(paths)
+    print "---NAME---"
+    print name
     
     
     if labels is not None:
