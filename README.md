@@ -26,3 +26,6 @@ https://github.com/alrojo/recurrent-spatial-transformer-code
 
 Deep residual networks(Code bugs - can compile but takes 1 hr. per epoch on mnist ..!?)
 https://github.com/alrojo/lasagne_residual_network
+
+## Other
+Should test out ZCA-whitening of local pixel chunks, like 8x8 or 16x16.
