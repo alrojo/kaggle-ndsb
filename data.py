@@ -322,51 +322,30 @@ def perturb_rescaled(img, scale, augmentation_params, target_shape=(50, 50), rng
     tform_augment = tform_uncenter + tform_augment + tform_center # shift to center, augment, shift back (for the rotation/shearing)
     return fast_warp(img, tform_rescale + tform_augment, output_shape=target_shape, mode='constant').astype('float32')
 
-def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="john!"):
+def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT NAMED!!!(check data.gen_images)"):
     paths_shuffled = np.array(paths)
-    print "@@GEN_IMAGES@@"    
-    print "labels"
-    print labels
-    print "shuffle"
-    print shuffle
-    print "repeat"
-    print repeat
-    print "rep"
-    print rep
-    print "paths"
-    print len(paths)
-    print "---NAME---"
-    print name
-    
+    print "Data loader INITIALIZED: %s" % name
+    print "  shuffle: %r" % shuffle
+    print "  repeat: %r" % repeat
+    print "  reps: %d" % rep
+    print "paths: %d" % len(paths)
     
     if labels is not None:
-        print "making shuff label"
+	labels = utils.one_hot(labels, m=num_classes).astype('float32')
         labels_shuffled = np.array(labels)
     
     while True:
         if shuffle:
-            print "setting shuffle paths"
             state = np.random.get_state()
             np.random.shuffle(paths_shuffled)
             if labels is not None:
-                print "setting shuffle labels"
                 np.random.set_state(state)
                 np.random.shuffle(labels_shuffled)
         for k in xrange(len(paths_shuffled)):
-            print "heading for %d path" % k
             path = paths_shuffled[k]
-            print "reading image ..."
             img = skimage.io.imread(path, as_grey=True)
-            print "spitting image out!"
-            print img.shape
-            print img.mean()
-            print img.max()
-            print img.min()
-            print "done ... phew"
             for i in range(rep):
-                print i
                 if labels is not None:
-                    print "okay ... final stage"
                     yield img, labels_shuffled[k]
                 else:
                     yield img
@@ -388,8 +367,6 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
 
     for sample in image_gen:
         if labels:
-            print "sample"
-            print len(sample)
             im, label = sample
         else:
             im = sample

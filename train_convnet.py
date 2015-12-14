@@ -189,8 +189,6 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
     print np.asarray(xs_chunk).shape
     print "chunk_y mean: %.5f" % y_chunk.mean()
     print y_chunk.shape
-    y_chunk = utils.one_hot(y_chunk, m=data.num_classes).astype('float32')
-    print y_chunk.shape
     if e > config.num_chunks_train:
         break;
 
