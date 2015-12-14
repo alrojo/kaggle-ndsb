@@ -158,7 +158,7 @@ else:
 if hasattr(config, 'create_train_gen'):
     create_train_gen = config.create_train_gen
 else:
-    image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True)
+    image_gen = data.gen_images(data.paths_train, utils.one_hot(data.labels_train, m=data.num_classes).astype('float32'), shuffle=True, repeat=True)
     create_train_gen = lambda: config.data_loader.create_random_gen(image_gen, labels=True)
 
 # TODO - implement Sander style validation ..!
@@ -171,7 +171,7 @@ else:
 if hasattr(config, 'create_eval_train_gen'):
     create_eval_train_gen = config.create_eval_train_gen
 else:
-    image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=False, repeat=False)
+    image_gen = data.gen_images(data.paths_train, labels=None, shuffle=False, repeat=False)
     create_eval_train_gen = lambda: config.data_loader.create_fixed_gen(image_gen, augment=False)
 
 
@@ -218,10 +218,10 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
     if ((e + 1) % config.validate_every) == 0:
         print
         print "Validating"
-        subsets = ["train", "valid"]
-        gens = [create_eval_train_gen, create_eval_valid_gen]
-        label_sets = [config.data_loader.labels_train, config.data_loader.labels_valid]
-        losses_eval = [losses_eval_train, losses_eval_valid]
+        subsets = ["train"]#, "valid"]
+        gens = [create_eval_train_gen]#, create_eval_valid_gen]
+        label_sets = [config.data_loader.labels_train]#, config.data_loader.labels_valid]
+        losses_eval = [losses_eval_train]#, losses_eval_valid]
 
         for subset, create_gen, labels, losses in zip(subsets, gens, label_sets, losses_eval):
             print "  %s set" % subset
