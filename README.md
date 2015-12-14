@@ -4,11 +4,17 @@ https://www.kaggle.com/c/noaa-right-whale-recognition
 
 The codebase used is by Sander Dieleman for his ndsb winning solution(thereof the fork, will move it to own project once I have my first top 20% submission)
 
-Current progress:
+## Current progress
+
 Update to lasagne v0.2Dev - DONE
+
 Make a data converter from kaggle whales to plankton style setup - DONE
+
 Rewrite the data loader to not relying on whole dataset in memory - IN PROGRESS
+
 Train a neural network - NOT STARTED
+
+## Supporting projects
 
 Further I have a bunch of "lead up" projects, that I will use this competition to test out, such as:
 
