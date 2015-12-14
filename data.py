@@ -361,6 +361,8 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
 
     for sample in image_gen:
         if labels:
+            print "sample"
+            print len(sample)
             im, label = sample
         else:
             im = sample
