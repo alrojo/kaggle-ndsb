@@ -340,6 +340,8 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1):
             img = skimage.io.imread(path, as_grey=True)
             for i in range(rep):
                 if labels is not None:
+		    print len(img)
+		    print len(labels_shuffled[k])
                     yield img, labels_shuffled[k]
                 else:
                     yield img
