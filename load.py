@@ -332,7 +332,7 @@ class DataLoader(object):
 
 class RescaledDataLoader(DataLoader):
     def create_random_gen(self, image_gen, labels):
-        gen = data.rescaled_patches_gen_augmented(image_gen, self.estimate_scale, labels=True, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_augmented(image_gen = image_gen, estimate_scale=self.estimate_scale, labels=True, patch_size=self.patch_size,
             chunk_size=self.chunk_size, augmentation_params=self.augmentation_params)
 
         def random_gen():
@@ -343,7 +343,7 @@ class RescaledDataLoader(DataLoader):
 
     def create_fixed_gen(self, image_gen, augment=False):
         augmentation_transforms = self.augmentation_transforms_test if augment else None
-        gen = data.rescaled_patches_gen_fixed(image_gen, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_fixed(image_gen=image_gen, estimate_scale=self.estimate_scale, patch_size=self.patch_size,
             chunk_size=self.chunk_size, augmentation_transforms=augmentation_transforms)
         
         def fixed_gen():

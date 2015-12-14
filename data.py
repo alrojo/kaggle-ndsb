@@ -324,24 +324,47 @@ def perturb_rescaled(img, scale, augmentation_params, target_shape=(50, 50), rng
 
 def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1):
     paths_shuffled = np.array(paths)
+    print "@@GEN_IMAGES@@"    
+    print "labels"
+    print labels
+    print "shuffle"
+    print shuffle
+    print "repeat"
+    print repeat
+    print "rep"
+    print rep
+    print "paths"
+    print len(paths)
+    
     
     if labels is not None:
+        print "making shuff label"
         labels_shuffled = np.array(labels)
     
     while True:
         if shuffle:
+            print "setting shuffle paths"
             state = np.random.get_state()
             np.random.shuffle(paths_shuffled)
             if labels is not None:
+                print "setting shuffle labels"
                 np.random.set_state(state)
                 np.random.shuffle(labels_shuffled)
         for k in xrange(len(paths_shuffled)):
+            print "heading for %d path" % k
             path = paths_shuffled[k]
+            print "reading image ..."
             img = skimage.io.imread(path, as_grey=True)
+            print "spitting image out!"
+            print img.shape
+            print img.mean()
+            print img.max()
+            print img.min()
+            print "done ... phew"
             for i in range(rep):
+                print i
                 if labels is not None:
-		    print len(img)
-		    print len(labels_shuffled[k])
+                    print "okay ... final stage"
                     yield img, labels_shuffled[k]
                 else:
                     yield img
