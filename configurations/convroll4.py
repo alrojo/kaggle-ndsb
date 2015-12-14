@@ -24,8 +24,8 @@ augmentation_params = {
     'allow_stretch': 1.3,
 }
 
-batch_size = 4#128 // 4
-chunk_size = 16#32768 // 4
+batch_size = 128 // 4
+chunk_size = (32768//32) // 4
 num_chunks_train = 840
 
 momentum = 0.9
