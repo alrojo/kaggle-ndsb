@@ -361,7 +361,7 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
 
     for sample in image_gen:
         if labels:
-            im, lable = sample
+            im, label = sample
         else:
             im = sample
         im = uint_to_float(im)
@@ -369,7 +369,7 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
         chunk_x[offset] = perturb_rescaled(im, scale, augmentation_params, target_shape=patch_size, rng=rng_aug)
         chunk_shape[offset] = im.shape
         if labels:
-            chunk_y[offset] = lable
+            chunk_y[offset] = label
         offset += 1
         
         if offset >= chunk_size:

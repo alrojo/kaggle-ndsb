@@ -158,7 +158,7 @@ else:
 if hasattr(config, 'create_train_gen'):
     create_train_gen = config.create_train_gen
 else:
-    image_gen = data.gen_images(data.paths_train, utils.one_hot(data.labels_train, m=data.num_classes).astype('float32'), shuffle=True, repeat=True)
+    image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True)
     create_train_gen = lambda: config.data_loader.create_random_gen(image_gen, labels=True)
 
 # TODO - implement Sander style validation ..!
@@ -188,6 +188,8 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
     print "chunk_x mean: %.5f" % np.asarray(xs_chunk).mean()
     print np.asarray(xs_chunk).shape
     print "chunk_y mean: %.5f" % y_chunk.mean()
+    print y_chunk.shape
+    y_chunk = utils.one_hot(y_chunk, m=data.num_classes).astype('float32')
     print y_chunk.shape
     if e > config.num_chunks_train:
         break;
