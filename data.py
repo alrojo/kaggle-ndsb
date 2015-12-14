@@ -322,30 +322,70 @@ def perturb_rescaled(img, scale, augmentation_params, target_shape=(50, 50), rng
     tform_augment = tform_uncenter + tform_augment + tform_center # shift to center, augment, shift back (for the rotation/shearing)
     return fast_warp(img, tform_rescale + tform_augment, output_shape=target_shape, mode='constant').astype('float32')
 
+def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1):
+    paths_shuffled = np.array(paths)
+    
+    if labels is not None:
+        labels_shuffled = np.arrays(labels)
+    
+    while True:
+        if shuffle:
+            state = np.random.get_state()
+            np.random.shuffle(paths_shuffled)
+            if labels is not None:
+                np.random.set_state(state)
+                np.random.shuffle(labels_shuffled)
+        for k in xrange(len(paths_shuffled)):
+            path = paths_shuffled[k]
+            img = skimage.io.imread(path, as_grey=True)
+            for i in range(rep):
+                if labels is not None:
+                    yield img, labels_shuffled[k]
+                else:
+                    yield img
+        if not repeat:
+            break
 
-def rescaled_patches_gen_augmented(images, labels, estimate_scale_func, patch_size=(50, 50),
+def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, patch_size=(50, 50),
         chunk_size=4096, num_chunks=100, rng=np.random, rng_aug=np.random, augmentation_params=default_augmentation_params):
+    # init vars
     p_x, p_y = patch_size
+    chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
+    chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
+    if labels:
+        chunk_y = np.zeros((chunk_size, num_classes), dtype='float32')
+    offset = 0
 
     if augmentation_params is None:
         augmentation_params = no_augmentation_params
 
-    for n in xrange(num_chunks):
-        indices = rng.randint(0, len(images), chunk_size)
-
-        chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
-        chunk_y = labels[indices].astype('float32')
-        chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
-
-        for k, idx in enumerate(indices):
-            img = images[idx]
-            img = uint_to_float(img)
-            scale = estimate_scale_func(img)
-            chunk_x[k] = perturb_rescaled(img, scale, augmentation_params, target_shape=patch_size, rng=rng_aug)
-            chunk_shape[k] = img.shape
+    for sample in image_gen:
+        if labels:
+            im, lable = sample
+        else:
+            im = sample
+        im = uint_to_float(im)
+        scale = estimate_scale_func(im)
+        chunk_x[offset] = perturb_rescaled(im, scale, augmentation_params, target_shape=patch_size, rng=rng_aug)
+        chunk_shape[offset] = im.shape
+        if labels:
+            chunk_y[offset] = lable
+        offset += 1
         
-        yield chunk_x, chunk_y, chunk_shape
-
+        if offset >= chunk_size:
+            if labels:
+                yield chunk_x, chunk_y, chunk_shape
+            else:
+                yield chunk_x, chunk_shape
+            
+            chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
+            chunk_shape = np.zeros((chunk_size, num_classes), dtype='float32')
+            offset = 0
+    if offset > 0:
+        if labels:
+            yield chunk_x, chunk_y, chunk_shape, offset
+        else:
+            yield chunk_x, chunk_shape, offset
 
 def rescaled_patches_gen_ordered(images, estimate_scale_func, patch_size=(50, 50), chunk_size=4096,
         augmentation_params=no_augmentation_params, rng=np.random, rng_aug=np.random):
@@ -387,40 +427,37 @@ def perturb_rescaled_fixed(img, scale, tform_augment, target_shape=(50, 50)):
     return fast_warp(img, tform_rescale + tform_augment, output_shape=target_shape, mode='constant').astype('float32')
 
 
-def rescaled_patches_gen_fixed(images, estimate_scale_func, patch_size=(50, 50), chunk_size=4096,
+def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 50), chunk_size=4096,
         augmentation_transforms=None, rng=np.random):
     if augmentation_transforms is None:
         augmentation_transforms = [tform_identity]
 
     p_x, p_y = patch_size
 
-    num_images = len(images)
     num_tfs = len(augmentation_transforms)
-    num_patches = num_images * num_tfs
-    num_chunks = int(np.ceil(num_patches / float(chunk_size)))
-
+    
     idx = 0
-
-    for n in xrange(num_chunks):
-        chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
-        chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
-        chunk_length = chunk_size
-
-        for k in xrange(chunk_size):
-            if idx >= num_patches:
-                chunk_length = k
-                break
-
-            img = images[idx // num_tfs]
-            img = uint_to_float(img)
-            tf = augmentation_transforms[idx % num_tfs]
-            scale = estimate_scale_func(img) # could technically be cached but w/e
-            chunk_x[k] = perturb_rescaled_fixed(img, scale, tf, target_shape=patch_size)
-            chunk_shape[k] = img.shape
-            idx += 1
-
-        yield chunk_x, chunk_shape, chunk_length
-
+    offset = 0
+    chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
+    chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
+    chunk_length = chunk_size
+    
+    for sample in image_gen(rep=num_tfs):
+        im = sample # Not even considering labels, should really merge with other gen, bad coding ..!
+        im = uint_to_float(im)
+        tf = augmentation_transforms[idx % num_tfs]
+        scale = estimate_scale_func(im)
+        chunk_x[offset] = perturb_rescaled_fixed(im, scale, tf, target_shape=patch_size)
+        chunk_shape[offset] = im.shape
+        offset += 1
+        idx += 1
+        if offset >= chunk_size:
+            yield chunk_x, chunk_shape, offset
+            chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
+            chunk_shape = np.zeros((chunk_size, num_classes), dtype='float32')
+            offset = 0
+    if offset > 0:
+        yield chunk_x, chunk_shape, offset
 
 
 ### MULTISCALE GENERATORS

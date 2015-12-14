@@ -307,21 +307,21 @@ class DataLoader(object):
     def estimate_params(self):
         pass
 
-    def load_train(self):
-        images = data.load('train')
-        labels = utils.one_hot(data.labels_train, m=121).astype(np.float32)
+#    def load_train(self):
+#        images = data.load('train')
+#        labels = utils.one_hot(data.labels_train, m=121).astype(np.float32)
 
-        split = np.load(self.validation_split_path)
-        indices_train = split['indices_train']
-        indices_valid = split['indices_valid']
+#        split = np.load(self.validation_split_path)
+#        indices_train = split['indices_train']
+#        indices_valid = split['indices_valid']
 
-        self.images_train = images[indices_train]
-        self.labels_train = labels[indices_train]
-        self.images_valid = images[indices_valid]
-        self.labels_valid = labels[indices_valid]
+#        self.images_train = images[indices_train]
+#        self.labels_train = labels[indices_train]
+#        self.images_valid = images[indices_valid]
+#        self.labels_valid = labels[indices_valid]
 
-    def load_test(self):
-        self.images_test = data.load('test')
+#    def load_test(self):
+#        self.images_test = data.load('test')
 
     def get_params(self):
         return { pname: getattr(self, pname, None) for pname in self.params }
@@ -331,9 +331,9 @@ class DataLoader(object):
 
 
 class RescaledDataLoader(DataLoader):
-    def create_random_gen(self, images, labels):
-        gen = data.rescaled_patches_gen_augmented(images, labels, self.estimate_scale, patch_size=self.patch_size,
-            chunk_size=self.chunk_size, num_chunks=self.num_chunks_train, augmentation_params=self.augmentation_params)
+    def create_random_gen(self, image_gen):
+        gen = data.rescaled_patches_gen_augmented(image_gen, labels=True, self.estimate_scale, patch_size=self.patch_size,
+            chunk_size=self.chunk_size, augmentation_params=self.augmentation_params)
 
         def random_gen():
             for chunk_x, chunk_y, chunk_shape in gen:
@@ -341,9 +341,9 @@ class RescaledDataLoader(DataLoader):
 
         return buffering.buffered_gen_threaded(random_gen())
 
-    def create_fixed_gen(self, images, augment=False):
+    def create_fixed_gen(self, image_gen, augment=False):
         augmentation_transforms = self.augmentation_transforms_test if augment else None
-        gen = data.rescaled_patches_gen_fixed(images, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_fixed(image_gen, self.estimate_scale, patch_size=self.patch_size,
             chunk_size=self.chunk_size, augmentation_transforms=augmentation_transforms)
         
         def fixed_gen():
@@ -360,15 +360,15 @@ class ZmuvRescaledDataLoader(RescaledDataLoader):
         self.estimate_zmuv_params() # zero mean unit variance
 
     def estimate_zmuv_params(self):
-        gen = data.rescaled_patches_gen_augmented(self.images_train, self.labels_train, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_augmented(self.image_gen, self.labels, self.estimate_scale, patch_size=self.patch_size,
             chunk_size=self.chunk_size, num_chunks=1, augmentation_params=self.augmentation_params)
         chunk_x, _, _ = gen.next()
         self.zmuv_mean = chunk_x.mean()
         self.zmuv_std = chunk_x.std()
 
-    def create_random_gen(self, images, labels):
-        gen = data.rescaled_patches_gen_augmented(images, labels, self.estimate_scale, patch_size=self.patch_size,
-            chunk_size=self.chunk_size, num_chunks=self.num_chunks_train, augmentation_params=self.augmentation_params)
+    def create_random_gen(self, image_gen, labels):
+        gen = data.rescaled_patches_gen_augmented(image_gen, labels, self.estimate_scale, patch_size=self.patch_size,
+            chunk_size=self.chunk_size, augmentation_params=self.augmentation_params)
 
         def random_gen():
             for chunk_x, chunk_y, chunk_shape in gen:
@@ -378,9 +378,9 @@ class ZmuvRescaledDataLoader(RescaledDataLoader):
 
         return buffering.buffered_gen_threaded(random_gen())
 
-    def create_fixed_gen(self, images, augment=False):
+    def create_fixed_gen(self, image_gen, augment=False):
         augmentation_transforms = self.augmentation_transforms_test if augment else None
-        gen = data.rescaled_patches_gen_fixed(images, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_fixed(image_gen, self.estimate_scale, patch_size=self.patch_size,
             chunk_size=self.chunk_size, augmentation_transforms=augmentation_transforms)
         
         def fixed_gen():

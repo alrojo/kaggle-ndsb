@@ -158,17 +158,21 @@ else:
 if hasattr(config, 'create_train_gen'):
     create_train_gen = config.create_train_gen
 else:
-    create_train_gen = lambda: config.data_loader.create_random_gen(config.data_loader.images_train, config.data_loader.labels_train)
+    image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True)
+    create_train_gen = lambda: config.data_loader.create_random_gen(image_gen, labels=True)
 
-if hasattr(config, 'create_eval_valid_gen'):
-    create_eval_valid_gen = config.create_eval_valid_gen
-else:
-    create_eval_valid_gen = lambda: config.data_loader.create_fixed_gen(config.data_loader.images_valid, augment=False)
+# TODO - implement Sander style validation ..!
+#if hasattr(config, 'create_eval_valid_gen'):
+#    create_eval_valid_gen = config.create_eval_valid_gen
+#else:
+#    image_gen = data.gen_images(data.paths, data.labels_train, shuffle=True, repeat=True)
+#    create_eval_valid_gen = lambda: config.data_loader.create_fixed_gen(config.data_loader.images_valid, augment=False)
 
 if hasattr(config, 'create_eval_train_gen'):
     create_eval_train_gen = config.create_eval_train_gen
 else:
-    create_eval_train_gen = lambda: config.data_loader.create_fixed_gen(config.data_loader.images_train, augment=False)
+    image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=False, repeat=False)
+    create_eval_train_gen = lambda: config.data_loader.create_fixed_gen(image_gen, augment=False)
 
 
 print "Train model"
@@ -181,6 +185,8 @@ num_batches_chunk = config.chunk_size // config.batch_size
 
 for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
     print "Chunk %d/%d" % (e + 1, config.num_chunks_train)
+    if e > config.num_chunks:
+        break;
 
     if e in learning_rate_schedule:
         lr = np.float32(learning_rate_schedule[e])
