@@ -450,9 +450,7 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
 #    chunk_length = chunk_size
     idx = 0
     offset = 0    
-    print('value of idx: %d' % idx)
-    print('value of offset: %d' % offset)
-    print('length of num_tfs: %d' % num_tfs)
+
     for sample in image_gen:
         im = sample # Not even considering labels, should really merge with other gen, bad coding ..!
         im = uint_to_float(im)
@@ -468,7 +466,7 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
             chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
             offset = 0
     if offset > 0:
-        print("went to second clause!")
+
         yield chunk_x, chunk_shape, offset
     
 
