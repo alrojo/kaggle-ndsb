@@ -158,8 +158,9 @@ else:
 if hasattr(config, 'create_train_gen'):
     create_train_gen = config.create_train_gen
 else:
-    image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True, name="train_gen")
-    create_train_gen = lambda: config.data_loader.create_random_gen(image_gen, labels=True)
+    def create_train_gen():
+        image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True, name="train_gen")
+        return config.data_loader.create_random_gen(image_gen, labels=True)
 
 # TODO - implement Sander style validation ..!
 #if hasattr(config, 'create_eval_valid_gen'):
@@ -171,8 +172,9 @@ else:
 if hasattr(config, 'create_eval_train_gen'):
     create_eval_train_gen = config.create_eval_train_gen
 else:
-    image_gen_eval_train = data.gen_images(data.paths_train, labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=1)
-    create_eval_train_gen = lambda: config.data_loader.create_fixed_gen(image_gen_eval_train, augment=False)
+    def create_eval_train_gen():
+        image_gen = data.gen_images(data.paths_train, labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=1)
+        return config.data_loader.create_fixed_gen(image_gen, augment=False)
 
 
 print "Train model"
