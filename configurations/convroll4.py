@@ -25,7 +25,7 @@ augmentation_params = {
 }
 
 batch_size = 128 // 4
-chunk_size = (32768//32) // 4
+chunk_size = 32768 // 4
 num_chunks_train = 840
 
 momentum = 0.9
