@@ -462,7 +462,7 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
         if offset >= chunk_size:
             yield chunk_x, chunk_shape, offset
             chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
-            chunk_shape = np.zeros((chunk_size, num_classes), dtype='float32')
+            chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
             offset = 0
     if offset > 0:
         yield chunk_x, chunk_shape, offset
