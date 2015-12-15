@@ -331,7 +331,7 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT
     print "paths: %d" % len(paths)
     
     if labels is not None:
-	labels = utils.one_hot(labels, m=num_classes).astype('float32')
+        labels = utils.one_hot(labels, m=num_classes).astype('float32')
         labels_shuffled = np.array(labels)
     
     while True:
@@ -387,8 +387,8 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
             chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
             chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
             if labels:
-		chunk_y = np.zeros((chunk_size, num_classes), dtype='float32')
-	    offset = 0
+                chunk_y = np.zeros((chunk_size, num_classes), dtype='float32')
+            offset = 0
     if offset > 0:
         if labels:
             yield chunk_x, chunk_y, chunk_shape, offset
@@ -444,12 +444,15 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
 
     num_tfs = len(augmentation_transforms)
     
-    idx = 0
-    offset = 0
+    
     chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
     chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
-    chunk_length = chunk_size
-    
+#    chunk_length = chunk_size
+    idx = 0
+    offset = 0    
+    print('value of idx: %d' % idx)
+    print('value of offset: %d' % offset)
+    print('length of num_tfs: %d' % num_tfs)
     for sample in image_gen:
         im = sample # Not even considering labels, should really merge with other gen, bad coding ..!
         im = uint_to_float(im)
@@ -465,8 +468,9 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
             chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
             offset = 0
     if offset > 0:
+        print("went to second clause!")
         yield chunk_x, chunk_shape, offset
-
+    
 
 ### MULTISCALE GENERATORS
 

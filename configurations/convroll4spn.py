@@ -36,7 +36,7 @@ learning_rate_schedule = {
     800: 0.00003,
 }
 
-validate_every = 2
+validate_every = 1
 save_every = 20
 
 
