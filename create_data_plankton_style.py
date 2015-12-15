@@ -4,7 +4,7 @@ import shutil
 
 import numpy as np
 import pandas as pd
-import skimage.io as sk
+from skimage import io, transform
 from scipy import ndimage
 from scipy import misc
 
@@ -34,8 +34,8 @@ print "Train"
 for i in range(len(train_paths)):
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", (train_paths[i]))
     path_to = "%s%s%s%s%s" % (os.getcwd(), "/data/train/", (csv['whaleID'][i]), "/", (train_paths[i]))
-    img = ndimage.imread(path_from)
-    rescaled = ndimage.zoom(img, (0.125, 0.125, 1))
+    img = io.imread(path_from, as_grey=True)
+    rescaled = transform.rescale(img, 0.125)
     print "%d: with shape: %s to shape: %s" %(i, img.shape, rescaled.shape)
     misc.imsave(path_to, rescaled)
 #    shutil.move(path_from, path_to)
@@ -44,7 +44,7 @@ print "Test"
 for path in test_paths:
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", path)
     path_to = "%s%s%s" % (os.getcwd(), "/data/test/", path)
-    img = ndimage.imread(path_from)
-    rescaled = ndimage.zoom(img, (0.125, 0.125, 1))
+    img = io.imread(path_from, as_grey=True)
+    rescaled = transform.rescale(img, 0.125)
     misc.imsave(path_to, rescaled)
 #    shutil.move(path_from, path_to)
