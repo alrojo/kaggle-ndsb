@@ -146,8 +146,7 @@ else:
     losses_eval_train = []
 
 
-print "Load data"
-#config.data_loader.load_train()
+print "Setting up data generator"
 
 if hasattr(config, 'resume_path'):
     config.data_loader.set_params(resume_metadata['data_loader_params'])
@@ -160,7 +159,8 @@ if hasattr(config, 'create_train_gen'):
 else:
     def create_train_gen():
         image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True, name="train_gen")
-        return config.data_loader.create_random_gen(image_gen, labels=True)
+        config.data_loader.load_train(image_gen, labels=True)
+        return config.data_loader.create_random_gen(config.data_loader.image_gen_train, labels=True)
 
 # TODO - implement Sander style validation ..!
 #if hasattr(config, 'create_eval_valid_gen'):

@@ -307,8 +307,9 @@ class DataLoader(object):
     def estimate_params(self):
         pass
 
-#    def load_train(self):
-#        images = data.load('train')
+    def load_train(self, image_gen_train, labels_train):
+         self.images_gen_train = image_gen_train
+         self.labels_train = labels_train
 #        labels = utils.one_hot(data.labels_train, m=121).astype(np.float32)
 
 #        split = np.load(self.validation_split_path)
@@ -320,8 +321,8 @@ class DataLoader(object):
 #        self.images_valid = images[indices_valid]
 #        self.labels_valid = labels[indices_valid]
 
-#    def load_test(self):
-#        self.images_test = data.load('test')
+    def load_test(self, image_gen_test):
+        self.images_test = image_gen_test
 
     def get_params(self):
         return { pname: getattr(self, pname, None) for pname in self.params }
@@ -360,7 +361,7 @@ class ZmuvRescaledDataLoader(RescaledDataLoader):
         self.estimate_zmuv_params() # zero mean unit variance
 
     def estimate_zmuv_params(self):
-        gen = data.rescaled_patches_gen_augmented(self.image_gen, self.labels, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_augmented(self.image_gen_train, False, self.estimate_scale, patch_size=self.patch_size,
             chunk_size=self.chunk_size, num_chunks=1, augmentation_params=self.augmentation_params)
         chunk_x, _, _ = gen.next()
         self.zmuv_mean = chunk_x.mean()
