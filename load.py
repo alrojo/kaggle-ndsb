@@ -308,7 +308,7 @@ class DataLoader(object):
         pass
 
     def load_train(self, image_gen_train, labels_train):
-         self.images_gen_train = image_gen_train
+         self.image_gen_train = image_gen_train
          self.labels_train = labels_train
 #        labels = utils.one_hot(data.labels_train, m=121).astype(np.float32)
 
@@ -361,14 +361,14 @@ class ZmuvRescaledDataLoader(RescaledDataLoader):
         self.estimate_zmuv_params() # zero mean unit variance
 
     def estimate_zmuv_params(self):
-        gen = data.rescaled_patches_gen_augmented(self.image_gen_train, False, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_augmented(self.image_gen_train, self.estimate_scale, True, patch_size=self.patch_size,
             chunk_size=self.chunk_size, num_chunks=1, augmentation_params=self.augmentation_params)
         chunk_x, _, _ = gen.next()
         self.zmuv_mean = chunk_x.mean()
         self.zmuv_std = chunk_x.std()
 
     def create_random_gen(self, image_gen, labels):
-        gen = data.rescaled_patches_gen_augmented(image_gen, labels, self.estimate_scale, patch_size=self.patch_size,
+        gen = data.rescaled_patches_gen_augmented(image_gen, self.estimate_scale, labels, patch_size=self.patch_size,
             chunk_size=self.chunk_size, augmentation_params=self.augmentation_params)
 
         def random_gen():

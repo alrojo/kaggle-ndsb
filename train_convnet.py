@@ -148,6 +148,9 @@ else:
 
 print "Setting up data generator"
 
+image_gen_train = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True, name="train_gen")
+config.data_loader.load_train(image_gen_train, True)
+
 if hasattr(config, 'resume_path'):
     config.data_loader.set_params(resume_metadata['data_loader_params'])
 else:
@@ -158,8 +161,7 @@ if hasattr(config, 'create_train_gen'):
     create_train_gen = config.create_train_gen
 else:
     def create_train_gen():
-        image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True, name="train_gen")
-        config.data_loader.load_train(image_gen, labels=True)
+        #image_gen = data.gen_images(data.paths_train, data.labels_train, shuffle=True, repeat=True, name="train_gen")
         return config.data_loader.create_random_gen(config.data_loader.image_gen_train, labels=True)
 
 # TODO - implement Sander style validation ..!
@@ -187,10 +189,8 @@ num_batches_chunk = config.chunk_size // config.batch_size
 
 for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
     print "Chunk %d/%d" % (e + 1, config.num_chunks_train)
-    print "chunk_x mean: %.5f" % np.asarray(xs_chunk).mean()
     print np.asarray(xs_chunk).shape
-    print "chunk_y mean: %.5f" % y_chunk.mean()
-    print y_chunk.shape
+
     if e > config.num_chunks_train:
         break;
 

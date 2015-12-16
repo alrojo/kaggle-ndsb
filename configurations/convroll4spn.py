@@ -61,7 +61,7 @@ augmentation_transforms_test = tta.build_quasirandom_transforms(70, **{
 
 
 
-data_loader = load.RescaledDataLoader(estimate_scale=estimate_scale, num_chunks_train=num_chunks_train,
+data_loader = load.ZmuvRescaledDataLoader(estimate_scale=estimate_scale, num_chunks_train=num_chunks_train,
     patch_size=patch_size, chunk_size=chunk_size, augmentation_params=augmentation_params,
     augmentation_transforms_test=augmentation_transforms_test)
 
