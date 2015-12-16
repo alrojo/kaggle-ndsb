@@ -350,11 +350,11 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT
                 if labels is not None:
                     yield img, labels_shuffled[k]
                 else:
-		    if k % 1000 == 10:
-			print "yield test"
-			print img.shape
-			print img.dtype
-                    yield img
+                    if k % 1000 == 10:
+                        print "yield test"
+                        print img.shape
+                        print img.dtype
+                    yield img, "ShittyPython"
         if not repeat:
             break
 
@@ -458,13 +458,13 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     idx = 0
     offset = 0    
 
-    for im in image_gen:
+    for im, j in image_gen:
         # Not even considering labels, should really merge with other gen, bad coding ..!
 #	print len(im)
 #	print im
         im = uint_to_float(im)
 #        print "chunk_gen: imshape:"
-#        print im.shape()
+        print im.shape()
         tf = augmentation_transforms[idx % num_tfs]
         scale = estimate_scale_func(im)
         chunk_x[offset] = perturb_rescaled_fixed(im, scale, tf, target_shape=patch_size)
