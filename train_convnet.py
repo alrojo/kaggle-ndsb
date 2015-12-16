@@ -229,8 +229,7 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
             print "  %s set" % subset
             outputs = []
             for xs_chunk_eval, chunk_length_eval in create_gen():
-		print(chunk_length_eval)
-                num_batches_chunk_eval = int(np.ceil(chunk_length_eval / float(config.batch_size)))
+		num_batches_chunk_eval = int(np.ceil(chunk_length_eval / float(config.batch_size)))
 
                 for x_shared, x_chunk_eval in zip(xs_shared, xs_chunk_eval):
                     x_shared.set_value(x_chunk_eval)
@@ -239,9 +238,7 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
                 for b in xrange(num_batches_chunk_eval):
                     out = compute_output(b)
                     outputs_chunk.append(out)
-
-                outputs_chunk = np.vstack(outputs_chunk)
-                outputs_chunk = outputs_chunk[:chunk_length_eval] # truncate to the right length
+		outputs_chunk = outputs_chunk[:chunk_length_eval] # truncate to the right length
                 outputs.append(outputs_chunk)
 
             outputs = np.vstack(outputs)
