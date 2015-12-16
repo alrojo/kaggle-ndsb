@@ -458,11 +458,16 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     idx = 0
     offset = 0    
 
-    for im, j in image_gen:
+    for sample in image_gen:
+	im, j = sample
         # Not even considering labels, should really merge with other gen, bad coding ..!
 #	print len(im)
 #	print im
+	print im
+	im = np.asarray(im)
+	print im
         im = uint_to_float(im)
+	print im
 #        print "chunk_gen: imshape:"
         print im.shape()
         tf = augmentation_transforms[idx % num_tfs]
