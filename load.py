@@ -322,7 +322,7 @@ class DataLoader(object):
 #        self.labels_valid = labels[indices_valid]
 
     def load_test(self, image_gen_test):
-        self.images_test = image_gen_test
+        self.image_gen_test = image_gen_test
 
     def get_params(self):
         return { pname: getattr(self, pname, None) for pname in self.params }

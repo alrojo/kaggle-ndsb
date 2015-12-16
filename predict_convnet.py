@@ -99,13 +99,13 @@ else:
     print "  NOT using test-time augmentation (noaug)"
 print("Num tfs: %d" % num_test_tfs)
 if subset.startswith("test"):
-    #config.data_loader.load_test()
+    image_gen = data.gen_images(data.paths['test'], labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=num_test_tfs)    
+    config.data_loader.load_test(image_gen)
     if hasattr(config, 'create_eval_test_gen'):
         gen = config.create_eval_test_gen()
         images = config.data_loader.images_test
     else:
-        image_gen = data.gen_images(data.paths['test'], labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=num_test_tfs)
-        gen = config.data_loader.create_fixed_gen(image_gen, augment=augment)
+        gen = config.data_loader.create_fixed_gen(config.data_loader.image_gen_test, augment=augment)
 elif subset.startswith("valid"):
     config.data_loader.load_train() # validation set is a subset of the training data
     if hasattr(config, 'create_eval_valid_gen'):
