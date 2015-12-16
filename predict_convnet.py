@@ -97,9 +97,9 @@ if augment:
     # num_predictions = len(images) * num_test_tfs
 else:
     print "  NOT using test-time augmentation (noaug)"
-
+print("Num tfs: %d" % num_test_tfs)
 if subset.startswith("test"):
-    config.data_loader.load_test()
+    #config.data_loader.load_test()
     if hasattr(config, 'create_eval_test_gen'):
         gen = config.create_eval_test_gen()
         images = config.data_loader.images_test
