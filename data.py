@@ -460,7 +460,10 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     offset = 0    
 
     for sample in image_gen:
-	im = sample
+	if (type(sample)==tuple):
+	    im, j = sample
+	else:
+	    im = sample
 #        print len(im)
 #	print im
 	print im
