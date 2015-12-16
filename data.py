@@ -342,6 +342,7 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT
                 np.random.set_state(state)
                 np.random.shuffle(labels_shuffled)
         for k in xrange(len(paths_shuffled)):
+            print "k = %d" % k
             path = paths_shuffled[k]
             img = skimage.io.imread(path, as_grey=True)
             for i in range(rep):
@@ -370,7 +371,7 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
             im, label = sample
         else:
             im = sample
-	im = uint_to_float(im)
+        im = uint_to_float(im)
         scale = estimate_scale_func(im)
         chunk_x[offset] = perturb_rescaled(im, scale, augmentation_params, target_shape=patch_size, rng=rng_aug)
         chunk_shape[offset] = im.shape
@@ -454,6 +455,8 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     for sample in image_gen:
         im = sample # Not even considering labels, should really merge with other gen, bad coding ..!
         im = uint_to_float(im)
+        print "chunk_gen: imshape:"
+        print im.shape()
         tf = augmentation_transforms[idx % num_tfs]
         scale = estimate_scale_func(im)
         chunk_x[offset] = perturb_rescaled_fixed(im, scale, tf, target_shape=patch_size)
