@@ -354,7 +354,7 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT
                         print "yield test"
                         print img.shape
                         print img.dtype
-                    yield img, "ShittyPython"
+                    yield img
         if not repeat:
             break
 
@@ -375,6 +375,7 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
         if labels:
             im, label = sample
         else:
+	    assert False # This is for future implementation, as is it will never reach this else clause
             im = sample
         im = uint_to_float(im)
 	#print im.shape
@@ -459,9 +460,8 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     offset = 0    
 
     for sample in image_gen:
-	im, j = sample
-        # Not even considering labels, should really merge with other gen, bad coding ..!
-#	print len(im)
+	im = sample
+#        print len(im)
 #	print im
 	print im
 	im = np.asarray(im)
@@ -469,7 +469,7 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
         im = uint_to_float(im)
 	print im
 #        print "chunk_gen: imshape:"
-        print im.shape()
+        print im.shape() # @@@@@@ WHERE IT BLOWS UP!!!, apperently im is a label ...
         tf = augmentation_transforms[idx % num_tfs]
         scale = estimate_scale_func(im)
         chunk_x[offset] = perturb_rescaled_fixed(im, scale, tf, target_shape=patch_size)
