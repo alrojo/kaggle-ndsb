@@ -13,7 +13,7 @@ import importlib
 
 import utils
 import nn_plankton
-
+import data
 
 if not (3 <= len(sys.argv) <= 5):
     sys.exit("Usage: predict_convnet.py <configuration_name> <metadata_path> [subset=test] [avg-method=avg-probs]")
@@ -91,14 +91,21 @@ config.data_loader.set_params(metadata['data_loader_params'])
 # don't call config.data_loader.estimate_params() here! Parameters don't need to be estimated.
 
 augment = not subset.endswith("noaug")
+if augment:
+    print "  using test-time augmentation"
+    num_test_tfs = len(config.data_loader.augmentation_transforms_test)
+    # num_predictions = len(images) * num_test_tfs
+else:
+    print "  NOT using test-time augmentation (noaug)"
+
 if subset.startswith("test"):
     config.data_loader.load_test()
     if hasattr(config, 'create_eval_test_gen'):
         gen = config.create_eval_test_gen()
         images = config.data_loader.images_test
     else:
-        images = config.data_loader.images_test
-        gen = config.data_loader.create_fixed_gen(images, augment=augment)
+        image_gen = data.gen_images(data.paths['test'], labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=num_test_tfs)
+        gen = config.data_loader.create_fixed_gen(image_gen, augment=augment)
 elif subset.startswith("valid"):
     config.data_loader.load_train() # validation set is a subset of the training data
     if hasattr(config, 'create_eval_valid_gen'):
@@ -117,13 +124,6 @@ else:
     print "Unknown subset: %s" % subset
 
 
-
-if augment:
-    print "  using test-time augmentation"
-    num_test_tfs = len(config.data_loader.augmentation_transforms_test)
-    # num_predictions = len(images) * num_test_tfs
-else:
-    print "  NOT using test-time augmentation (noaug)"
     # num_predictions = len(images)
 
 # print "  %d predictions will be made" % num_predictions
