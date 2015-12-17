@@ -175,7 +175,7 @@ if hasattr(config, 'create_eval_train_gen'):
     create_eval_train_gen = config.create_eval_train_gen
 else:
     def create_eval_train_gen():
-        image_gen = data.gen_images(data.paths_train, labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=1)
+        image_gen = data.gen_images(data.paths_train, labels=None, shuffle=False, repeat=False, name="eval_train_gen")
         return config.data_loader.create_fixed_gen(image_gen, augment=False)
 
 
