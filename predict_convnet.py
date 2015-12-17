@@ -140,10 +140,19 @@ for e, (xs_chunk, chunk_length) in enumerate(gen):
     num_batches_chunk = int(np.ceil(chunk_length / float(config.batch_size)))
 
     print "Chunk %d" % (e + 1)
+<<<<<<< HEAD
     print "mean data: %.5f" % np.asarray(xs_chunk).mean()
     print "data shapes:"
     print np.asarray(xs_chunk).shape
     print chunk_length
+=======
+    print "chunk size and mean"
+    print np.asarray(xs_chunk).shape
+    print np.asarray(xs_chunk).mean()
+    utils.save_gz(np.asarray(xs_chunk))
+    print "utils saved the chunks ..."
+    assert False
+>>>>>>> test
     print "  load data onto GPU"
     for x_shared, x_chunk in zip(xs_shared, xs_chunk):
         x_shared.set_value(x_chunk)
