@@ -322,13 +322,12 @@ def perturb_rescaled(img, scale, augmentation_params, target_shape=(50, 50), rng
     tform_augment = tform_uncenter + tform_augment + tform_center # shift to center, augment, shift back (for the rotation/shearing)
     return fast_warp(img, tform_rescale + tform_augment, output_shape=target_shape, mode='constant').astype('float32')
 
-def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT NAMED!!!(check data.gen_images)"):
+def gen_images(paths, labels=None, shuffle=False, repeat=False, name="NOT NAMED!!!(check data.gen_images)"):
     paths_shuffled = np.array(paths)
     print "Data loader INITIALIZED: %s" % name
     print "  shuffle: %r" % shuffle
     print "  repeat: %r" % repeat
-    print "  reps: %d" % rep
-    print "paths: %d" % len(paths)
+    print "  no. paths: %d" % len(paths)
     
     if labels is not None:
         labels = utils.one_hot(labels, m=num_classes).astype('float32')
@@ -344,11 +343,10 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT
         for k in xrange(len(paths_shuffled)):
             path = paths_shuffled[k]
             img = skimage.io.imread(path, as_grey=True)
-            for i in range(rep):
-                if labels is not None:
-                    yield img, labels_shuffled[k]
-                else:
-                    yield img
+            if labels is not None:
+                yield img, labels_shuffled[k]
+            else:
+                yield img
         if not repeat:
             break
 
@@ -448,18 +446,21 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
     chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
 #    chunk_length = chunk_size
-    idx = 0
     offset = 0    
 
     for sample in image_gen:
         im = sample # Not even considering labels, should really merge with other gen, bad coding ..!
         im = uint_to_float(im)
-        tf = augmentation_transforms[idx % num_tfs]
-        scale = estimate_scale_func(im)
-        chunk_x[offset] = perturb_rescaled_fixed(im, scale, tf, target_shape=patch_size)
-        chunk_shape[offset] = im.shape
-        offset += 1
-        idx += 1
+        im = np.expand_dims(im, axis=0)
+        im = np.repeat(im, num_tfs, axis=0)
+        for i in range(num_tfs):
+            img = im[i]
+            tf = augmentation_transforms[i]
+            scale = estimate_scale_func(img)
+            # repeating for test time augmentation
+            chunk_x[offset] = perturb_rescaled_fixed(img, scale, tf, target_shape=patch_size)
+            chunk_shape[offset] = img.shape
+            offset += 1
         if offset >= chunk_size:
             yield chunk_x, chunk_shape, offset
             chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
