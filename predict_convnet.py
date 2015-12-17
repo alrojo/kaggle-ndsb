@@ -99,7 +99,7 @@ else:
     print "  NOT using test-time augmentation (noaug)"
 print("Num tfs: %d" % num_test_tfs)
 if subset.startswith("test"):
-    image_gen = data.gen_images(data.paths['test'], labels=None, shuffle=False, repeat=False, name="eval_train_gen", rep=num_test_tfs)    
+    image_gen = data.gen_images(data.paths['test'], labels=None, shuffle=False, repeat=False, name="eval_train_gen")    
     config.data_loader.load_test(image_gen)
     if hasattr(config, 'create_eval_test_gen'):
         gen = config.create_eval_test_gen()

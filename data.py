@@ -454,18 +454,18 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
         im = np.expand_dims(im, axis=0)
         im = np.repeat(im, num_tfs, axis=0)
         for i in range(num_tfs):
-            img = im[i]
-            tf = augmentation_transforms[i]
+	    img = im[i]
+	    tf = augmentation_transforms[i]
             scale = estimate_scale_func(img)
             # repeating for test time augmentation
             chunk_x[offset] = perturb_rescaled_fixed(img, scale, tf, target_shape=patch_size)
             chunk_shape[offset] = img.shape
             offset += 1
-        if offset >= chunk_size:
-            yield chunk_x, chunk_shape, offset
-            chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
-            chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
-            offset = 0
+            if offset >= chunk_size:
+                yield chunk_x, chunk_shape, offset
+                chunk_x = np.zeros((chunk_size, p_x, p_y), dtype='float32')
+                chunk_shape = np.zeros((chunk_size, 2), dtype='float32')
+                offset = 0
     if offset > 0:
 
         yield chunk_x, chunk_shape, offset
