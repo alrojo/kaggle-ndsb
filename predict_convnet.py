@@ -143,7 +143,7 @@ for e, (xs_chunk, chunk_length) in enumerate(gen):
     print "chunk size and mean"
     print np.asarray(xs_chunk).shape
     print np.asarray(xs_chunk).mean()
-    np.save(np.asarray(xs_chunk))
+    np.save("chunk_x.npy", np.asarray(xs_chunk[:1024]))
     print "utils saved the chunks ..."
     assert False
     print "  load data onto GPU"
