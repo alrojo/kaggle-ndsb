@@ -325,8 +325,6 @@ def perturb_rescaled(img, scale, augmentation_params, target_shape=(50, 50), rng
 def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT NAMED!!!(check data.gen_images)"):
     paths_shuffled = np.array(paths)
     print "Data loader INITIALIZED: %s" % name
-    print "  labels:"
-    print labels
     print "  shuffle: %r" % shuffle
     print "  repeat: %r" % repeat
     print "  reps: %d" % rep
@@ -346,14 +344,10 @@ def gen_images(paths, labels=None, shuffle=False, repeat=False, rep=1, name="NOT
         for k in xrange(len(paths_shuffled)):
             path = paths_shuffled[k]
             img = skimage.io.imread(path, as_grey=True)
-	    for i in range(rep):
+            for i in range(rep):
                 if labels is not None:
                     yield img, labels_shuffled[k]
                 else:
-                    if k % 1000 == 10:
-                        print "yield test"
-                        print img.shape
-                        print img.dtype
                     yield img
         if not repeat:
             break
@@ -375,10 +369,8 @@ def rescaled_patches_gen_augmented(image_gen, estimate_scale_func, labels=True, 
         if labels:
             im, label = sample
         else:
-	    assert False # This is for future implementation, as is it will never reach this else clause
             im = sample
-        im = uint_to_float(im)
-	#print im.shape
+	im = uint_to_float(im)
         scale = estimate_scale_func(im)
         chunk_x[offset] = perturb_rescaled(im, scale, augmentation_params, target_shape=patch_size, rng=rng_aug)
         chunk_shape[offset] = im.shape
@@ -460,19 +452,8 @@ def rescaled_patches_gen_fixed(image_gen, estimate_scale_func, patch_size=(50, 5
     offset = 0    
 
     for sample in image_gen:
-	if (type(sample)==tuple):
-	    im, j = sample
-	else:
-	    im = sample
-#        print len(im)
-#	print im
-	print im
-	im = np.asarray(im)
-	print im
+        im = sample # Not even considering labels, should really merge with other gen, bad coding ..!
         im = uint_to_float(im)
-	print im
-#        print "chunk_gen: imshape:"
-        print im.shape() # @@@@@@ WHERE IT BLOWS UP!!!, apperently im is a label ...
         tf = augmentation_transforms[idx % num_tfs]
         scale = estimate_scale_func(im)
         chunk_x[offset] = perturb_rescaled_fixed(im, scale, tf, target_shape=patch_size)
