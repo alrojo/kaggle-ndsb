@@ -34,8 +34,11 @@ print "Train"
 for i in range(len(train_paths)):
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", (train_paths[i]))
     path_to = "%s%s%s%s%s" % (os.getcwd(), "/data/train/", (csv['whaleID'][i]), "/", (train_paths[i]))
-    img = io.imread(path_from, as_grey=True)
-    rescaled = transform.rescale(img, 0.125)
+    img = misc.imread(path_from)
+    p_x, p_y, c = img.shape
+    z_x = 1./(p_x/512.)
+    z_y = 1./(p_y/512.)
+    rescaled = ndimage.zoom(img, (z_x, z_y, 1))
     print "%d: with shape: %s to shape: %s" %(i, img.shape, rescaled.shape)
     misc.imsave(path_to, rescaled)
 #    shutil.move(path_from, path_to)
@@ -44,7 +47,11 @@ print "Test"
 for path in test_paths:
     path_from = "%s%s%s" % (os.getcwd(), "/data/imgs/", path)
     path_to = "%s%s%s" % (os.getcwd(), "/data/test/", path)
-    img = io.imread(path_from, as_grey=True)
-    rescaled = transform.rescale(img, 0.125)
+    img = misc.imread(path_from)
+    p_x, p_y, c = img.shape
+    z_x = 1./(p_x/512.)
+    z_y = 1./(p_y/512.)
+    rescaled = ndimage.zoom(img, (z_x, z_y, 1))
+    print "%d: with shape: %s to shape: %s" %(i, img.shape, rescaled.shape)
     misc.imsave(path_to, rescaled)
 #    shutil.move(path_from, path_to)
