@@ -10,7 +10,7 @@ from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 _srng = RandomStreams()
 
 
-def log_loss(y, t, eps=1e-15):
+def log_loss(y, t, params, eps=1e-10):
     """
     cross entropy loss, summed over classes, mean over batches
     """

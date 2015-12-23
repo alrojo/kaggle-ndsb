@@ -24,6 +24,9 @@ import nn_plankton
 
 from subprocess import Popen
 
+print "defining symbolics"
+sym_x = T.tensor4("sym_x")
+sym_t = T.matrix("sym_t")
 
 if len(sys.argv) < 2:
     sys.exit("Usage: train_convnet.py <configuration_name>")
@@ -51,7 +54,7 @@ else:
     l_ins, l_out = model
     l_resume = l_out
     l_exclude = l_ins[0]
-
+all_params = nn.layers.get_all_params(l_out)
 
 all_layers = nn.layers.get_all_layers(l_out)
 num_params = nn.layers.count_params(l_out)
@@ -61,26 +64,24 @@ for layer in all_layers:
     name = string.ljust(layer.__class__.__name__, 32)
     print "    %s %s" % (name, nn.layers.get_output_shape(layer))
 
-
-target_var = T.matrix("target")
-
-train_output = nn.layers.get_output(l_out, deterministic=False)
+train_output = nn.layers.get_output(sym_x, l_out, deterministic=False)
 if hasattr(config, 'build_objective'):
-    loss = config.build_objective(l_ins, l_out, train_output, target_var)
+    loss = config.build_objective(l_ins, l_out, train_output, sym_t)
 else:
-    loss = nn_plankton.log_loss(train_output, target_var)
+    reg_term = sum(T.sum(p**2) for p in all_params)
+    loss = nn_plankton.log_loss(train_output, sym_t) + config.l2*reg_term
 
 train_loss = loss.mean()
 
-eval_output = nn.layers.get_output(l_out, deterministic=True)
+eval_output = nn.layers.get_output(sym_x, l_out, deterministic=True)
 
-all_params = nn.layers.get_all_params(l_out)
+
 #all_excluded_params = nn.layers.get_all_params(l_exclude)
 #all_params = list(set(all_params) - set(all_excluded_params))
 
-input_ndims = [len(nn.layers.get_output_shape(l_in)) for l_in in l_ins]
-xs_shared = [nn.utils.shared_empty(dim=ndim) for ndim in input_ndims]
-y_shared = nn.utils.shared_empty(dim=2)
+#input_ndims = [len(nn.layers.get_output_shape(l_in)) for l_in in l_ins]
+#xs_shared = [nn.utils.shared_empty(dim=ndim) for ndim in input_ndims]
+#y_shared = nn.utils.shared_empty(dim=2)
 
 if hasattr(config, 'learning_rate_schedule'):
     learning_rate_schedule = config.learning_rate_schedule
@@ -88,13 +89,14 @@ else:
     learning_rate_schedule = { 0: config.learning_rate }
 learning_rate = theano.shared(np.float32(learning_rate_schedule[0]))
 
-idx = T.lscalar('idx')
 
-givens = {
-    target_var: y_shared[idx*config.batch_size:(idx+1)*config.batch_size],
-}
-for l_in, x_shared in zip(l_ins, xs_shared):
-     givens[l_in.input_var] = x_shared[idx*config.batch_size:(idx+1)*config.batch_size]
+#idx = T.lscalar('idx')
+
+#givens = {
+#    target_var: y_shared[idx*config.batch_size:(idx+1)*config.batch_size],
+#}
+#for l_in, x_shared in zip(l_ins, xs_shared):
+#     givens[l_in.input_var] = x_shared[idx*config.batch_size:(idx+1)*config.batch_size]
 
 
 if hasattr(config, 'build_updates'):
@@ -105,9 +107,10 @@ else:
 if hasattr(config, 'censor_updates'):
     updates = config.censor_updates(updates, l_out)
 
-
-iter_train = theano.function([idx], train_loss, givens=givens, updates=updates)
-compute_output = theano.function([idx], eval_output, givens=givens, on_unused_input="ignore")
+iter_train = theano.function([sym_x, sym_t], train_loss, updates=updates)
+compute_output = theano.function([sym_x], eval_output, on_unused_input="ignore")
+#iter_train = theano.function([idx], train_loss, givens=givens, updates=updates)
+#compute_output = theano.function([idx], eval_output, givens=givens, on_unused_input="ignore")
 
 
 if hasattr(config, 'resume_path'):
@@ -179,7 +182,7 @@ copy_process = None
 
 num_batches_chunk = config.chunk_size // config.batch_size
 
-for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
+for e, (xs_chunk, t_chunk) in izip(chunks_train_idcs, create_train_gen()):
     print "Chunk %d/%d" % (e + 1, config.num_chunks_train)
 #    np.save('john.npy', np.asarray(xs_chunk).squeeze()[:100])
 #    assert False
@@ -188,15 +191,17 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
         print "  setting learning rate to %.7f" % lr
         learning_rate.set_value(lr)
 
-    print "  load training data onto GPU"
-    for x_shared, x_chunk in zip(xs_shared, xs_chunk):
-        x_shared.set_value(x_chunk)
-    y_shared.set_value(y_chunk)
+#    print "  load training data onto GPU"
+#    for x_shared, x_chunk in zip(xs_shared, xs_chunk):
+#        x_shared.set_value(x_chunk)
+#    y_shared.set_value(y_chunk)
 
     print "  batch SGD"
     losses = []
-    for b in xrange(num_batches_chunk):
-        loss = iter_train(b)
+    for idx in xrange(num_batches_chunk):
+        x_batch = xs_chunk[idx*config.batch_size:(idx+1)*config.batch_size]
+        t_batch = t_chunk[idx*config.batch_size:(idx+1)*config.batch_size]
+        loss = iter_train(x_batch, t_batch)
         if np.isnan(loss):
             raise RuntimeError("NaN DETECTED.")
         losses.append(loss)
@@ -220,12 +225,13 @@ for e, (xs_chunk, y_chunk) in izip(chunks_train_idcs, create_train_gen()):
             for xs_chunk_eval, chunk_length_eval in create_gen():
                 num_batches_chunk_eval = int(np.ceil(chunk_length_eval / float(config.batch_size)))
 
-                for x_shared, x_chunk_eval in zip(xs_shared, xs_chunk_eval):
-                    x_shared.set_value(x_chunk_eval)
+#                for x_shared, x_chunk_eval in zip(xs_shared, xs_chunk_eval):
+#                    x_shared.set_value(x_chunk_eval)
 
                 outputs_chunk = []
-                for b in xrange(num_batches_chunk_eval):
-                    out = compute_output(b)
+                for idx in xrange(num_batches_chunk_eval):
+                    x_batch = xs_chunk_eval[idx*config.batch_size:(idx+1)*config.batch_size]
+                    out = compute_output(x_batch)
                     outputs_chunk.append(out)
 
                 outputs_chunk = np.vstack(outputs_chunk)
