@@ -22,7 +22,6 @@ if len(sys.argv) != 2:
 config_name = sys.argv[1]
 
 config = importlib.import_module("configurations.%s" % config_name)
-optimizer = config.optimizer
 print "Using configurations: '%s'" % config_name
 
 timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -33,7 +32,7 @@ metadata_target_path = os.path.join(os.getcwd(), "metadata/%s.pkl" % experiment_
 print "Experiment id: %s" % experiment_id
 
 sym_y = T.imatrix('target_output')
-sym_x = T.tensor3()
+sym_x = T.tensor4()
 TOL = 1e-8
 num_epochs = config.epochs
 batch_size = config.batch_size
