@@ -197,6 +197,8 @@ for e, (xs_chunk, t_chunk) in izip(chunks_train_idcs, create_train_gen()):
 #    y_shared.set_value(y_chunk)
 
     print "  batch SGD"
+    print len(xs_chunk)
+    print np.asarray(xs_chunk).shape
     losses = []
     for idx in xrange(num_batches_chunk):
         x_batch = xs_chunk[idx*config.batch_size:(idx+1)*config.batch_size]
