@@ -10,9 +10,9 @@ Update to lasagne v0.2Dev - DONE
 
 Make a data converter from kaggle whales to plankton style setup - DONE
 
-Rewrite the data loader to not relying on whole dataset in memory - IN PROGRESS
+Rewrite the data loader to not relying on whole dataset in memory - DONE (though as I only use 512x512 it can actually fit in memory, why I use the branch testingreg now)
 
-Train a neural network - NOT STARTED
+Train a neural network - Got a top 20% submission
 
 ## Supporting projects
 
@@ -24,7 +24,7 @@ https://github.com/alrojo/ZoomSPN
 SPN B-Trees(code works, just needs to write config):
 https://github.com/alrojo/recurrent-spatial-transformer-code
 
-Deep residual networks(Code bugs - can compile but takes 1 hr. per epoch on mnist ..!?)
+Deep residual networks(code works, just needs to write config)
 https://github.com/alrojo/lasagne_residual_network
 
 ## Other
