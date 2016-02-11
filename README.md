@@ -1,8 +1,8 @@
 # kaggle-whales
-Code project for the kaggle whales competition currently on kaggle
+Code project for the kaggle whales competition on kaggle
 https://www.kaggle.com/c/noaa-right-whale-recognition
 
-The codebase used is by Sander Dieleman for his ndsb winning solution(thereof the fork, will move it to own project once I have my first top 20% submission)
+The codebase used is by Sander Dieleman for his ndsb winning solution.
 
 ## Current progress
 
@@ -16,7 +16,7 @@ Train a neural network - Got a top 20% submission
 
 ## Supporting projects
 
-Further I have a bunch of "lead up" projects, that I will use this competition to test out, such as:
+Further I have a bunch of "lead up" projects, that I havn't had time to test out, but could be cool.
 
 Scale SPN(code works, just needs to write config):
 https://github.com/alrojo/ZoomSPN
